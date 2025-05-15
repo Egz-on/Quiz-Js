@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz UI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-[#1B0F34] flex items-center justify-center h-screen">
+    <div class="relative p-6">
+        <div id="quiz" class="bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg p-10 text-white text-xl font-bold relative">
+            <span class="absolute top-2 right-4 text-yellow-400 text-2xl">?</span>
+            <p id="question"></p>
+        </div>
+
+        <div class="flex flex-col gap-4 mt-6" id="answer-buttons"></div>
+        <button class="hidden mx-auto my-4 px-3 py-3 border-2 border-blue-400 text-white rounded-lg w-40 hover:bg-blue-600 transition" id="next-btn">Next</button>
+    </div>
+
+    <script>
+        const Questions = [
+            {
+                question: "What is the height of the Empire State Building?",
+                answers: [
+                    { text: "A. 534 m", correct: false },
+                    { text: "B. 271 m", correct: false },
+                    { text: "C. 443 m", correct: true },  // Corrected answer
+                    { text: "D. 702 m", correct: false }
+                ]
+            },
+            {
+                question: "What is the capital of France?",
+                answers: [
+                    { text: "A. Berlin", correct: false },
+                    { text: "B. Madrid", correct: false },
+                    { text: "C. Paris", correct: true },
+                    { text: "D. Rome", correct: false }
+                ]
+            },
+            {
+                question: "Which planet is known as the Red Planet?",
+                answers: [
+                    { text: "A. Venus", correct: false },
+                    { text: "B. Mars", correct: true },
+                    { text: "C. Jupiter", correct: false },
+                    { text: "D. Saturn", correct: false }
+                ]
+            },
+            {
+                question: "What is the chemical symbol for water?",
+                answers: [
+                    { text: "A. CO2", correct: false },
+                    { text: "B. H2O", correct: true },
+                    { text: "C. O2", correct: false },
+                    { text: "D. NaCl", correct: false }
+                ]
+            }
+        ];
+
+        const questionElement = document.getElementById("question");
+        const answerButtons = document.getElementById("answer-buttons");
+        const nextButton = document.getElementById("next-btn");
+
+        let currentQuestionIndex = 0;
+        let score = 0;
+
+        function showQuiz() {
+            currentQuestionIndex = 0;
+            score = 0;
+            nextButton.innerHTML = "Next";
+            showQuestion();
+        }
+
+        function showQuestion() {
+            resetState();
+            let currentQuestion = Questions[currentQuestionIndex];
+            let questionNo = currentQuestionIndex + 1;
+            questionElement.innerHTML = `${questionNo}. ${currentQuestion.question}`;
+
+            currentQuestion.answers.forEach(answer => {
+                const button = document.createElement("button");
+                button.innerText = answer.text;
+                button.classList.add(
+                    "w-full",
+                    "py-4",
+                    "border-2",
+                    "border-blue-400",
+                    "text-white",
+                    "rounded-lg",
+                    "hover:bg-blue-600",
+                    "transition",
+                    "disabled:cursor-not-allowed"
+                );
+                if (answer.correct) {
+                    button.dataset.correct = "true";
+                }
+                button.addEventListener("click", selectAnswer);
+                answerButtons.appendChild(button);
+            });
+        }
+
+        function resetState() {
+            nextButton.style.display = "none";
+            answerButtons.innerHTML = ""; // Clears previous buttons
+        }
+
+        function selectAnswer(e) {
+            const selectedBtn = e.target;
+            const isCorrect = selectedBtn.dataset.correct === "true";
+
+            if (isCorrect) {
+                score++;
+                selectedBtn.style.backgroundColor = "#5C7F50"; 
+            } else {
+                selectedBtn.style.backgroundColor = "#F75C5C";
+            }
+
+            Array.from(answerButtons.children).forEach(button => {
+                if (button.dataset.correct === "true") {
+                    button.style.backgroundColor = "#5C7F50"; 
+                }
+                button.disabled = true;
+            });
+
+            nextButton.style.display = "block";
+        }
+
+        function handleNextButton() {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < Questions.length) {
+                showQuestion();
+            } else {
+                showScore();
+            }
+        }
+
+        function showScore() {
+            resetState();
+            questionElement.innerHTML = `Ju Keni gjetur ${score} nga ${Questions.length} pyetjeve!`;
+            nextButton.innerHTML = "Play Again";
+            nextButton.style.display = "block";
+        }
+
+        nextButton.addEventListener("click", () => {
+            if (currentQuestionIndex < Questions.length) {
+                handleNextButton();
+            } else {
+                showQuiz();
+            }
+        });
+
+        showQuiz();
+    </script>
+</body>
+</html>
